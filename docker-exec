@@ -1,0 +1,90 @@
+#!/bin/bash
+
+init=0
+run=0
+IncorrInput=0
+HelpMe=0
+DockerName=""
+DockerFilePath=""
+IncorrArg=""
+sshport="3022"
+
+for i in `seq 1 $#`;
+ do
+   key=$1
+   case $key in
+     --help)
+       HelpMe=1
+       ;;
+     --name=*)
+       DockerName=${key#*=}
+       ;;
+     --Dockerfile=*)
+       DockerFilePath=${key#*=}
+       ;;
+     --init)
+       init=1
+       ;;
+     --run)
+       run=1
+       ;;
+     --ssh=*)
+       sshport=${key//[!0-9]/}
+       ;;
+     *)  
+       IncorrInput=1
+       IncorrArg=$key
+      ;; 
+   esac
+   shift
+ done
+
+if [ "$key" == "" ]; then
+ echo -e "\nUsage: docker-exec --init --run --name=<container name> --Dockerfile=<path> --ssh=<port>"
+ exit 0
+elif [ "$IncorrInput" == "1" ]; then
+ echo -e  "\nError: wrong/unknown argument: $IncorrArg\nExamples:\n       docker-exec --init --run --name=ubuntu16:04 --Dockerfile=/home/user/ --ssh=3022"
+ exit 1
+elif [ "$HelpMe" == "1" ]; then
+ echo -e "\nUsage: docker-exec --init --run --name=<container name> --Dockerfile=<path> --ssh=<port>"
+ exit 0
+elif [ "$DockerName" == "" ]; then
+ echo -e  "\nError: Failed to recognize the name\nExamples:\n       docker-exec --init --run --name=ubuntu16:04 --Dockerfile=/home/user/ --ssh=3022"
+ exit 1
+elif [ "$sshport" == "" ]; then
+ echo -e "\nError: Port number is empty, should be between 1 and 65636"
+ exit 1
+elif [ "$sshport" -gt "65636" ] || [ "$sshport" -lt "1" ]; then
+  echo -e  "\nError: Wrong port number, should be between 1 and 65636"
+  exit 1
+elif [ "$init" == "1" ]; then
+ if [ "$DockerFilePath" == "" ]; then
+  echo -e  "\nError: Failed to recognize the path to the Dockerfile\nExamples:\n       docker-exec --init --run --name=ubuntu16:04 --Dockerfile=/home/user/ --ssh=3022"
+  exit 1
+ elif [ ! -d "$DockerFilePath" ]; then
+  echo -e  "\nError: The directory with Dockerfile doesn't exists."
+  exit 1
+ elif [ ! -f "$DockerFilePath/Dockerfile" ]; then
+  echo -e  "\nError: There is no Dockerfile in $DockerFilePath"
+  exit 1
+ fi
+else
+ if [ "$run" == "1" ] && [ "$init" == "0" ]; then
+  if [[ "$DockerName" = *":"* ]]; then
+   DockerImgCheck=`docker images | awk {'print $1":"$2'} | egrep "^$DockerName$"`
+  else 
+   DockerImgCheck=`docker images | awk {'print $1":"$2'} | egrep "^$DockerName:latest$"`
+  fi
+  if [ "$?" == "1" ]; then
+   echo -e "\nError: Docker Image $DockerName not found"
+   exit 1
+  fi
+ fi
+fi
+
+if [ "$init" == "1" ]; then
+ docker build -t $DockerName $DockerFilePath
+fi
+if [ "$run" == "1" ] && [ "$?" == "0" ]; then
+ docker run -d -p $sshport:22 -p 80:80 $DockerName
+fi

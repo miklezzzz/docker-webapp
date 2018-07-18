@@ -1,0 +1,25 @@
+- name: (task name install-Python-from-sources.yml) Download Python 3.5.4 source package
+  get_url:
+    url: https://www.python.org/ftp/python/3.5.4/Python-3.5.4.tgz
+    dest: /usr/local/src/Python-3.5.4.tgz
+    mode: 0440
+  become: true
+  when: ansible_python_version != '3.5.4'
+
+- name: (task name install-Python-from-sources.yml) Untar Python 3.5.4 archive into /usr/local/src
+  unarchive:
+    src: /usr/local/src/Python-3.5.4.tgz
+    dest: /usr/local/src/
+    remote_src: yes
+  become: true
+  when: ansible_python_version != '3.5.4'
+
+- name: (task name install-Python-from-sources.yml) Install Python 3.5.4 from sources into /usr (substitute current python3)
+  shell: cd /usr/local/src/Python-3.5.4 && ./configure --prefix=/usr && make && make install && make clean
+  become: true
+  when: ansible_python_version != '3.5.4'
+
+- name: (task name install-Python-from-sources.yml) Add dist-packages directory to Python sys.path 
+  shell: echo "/usr/lib/python3/dist-packages" > /usr/lib/python3.5/site-packages/dist-packages.pth
+  become: true
+  when: ansible_python_version != '3.5.4'

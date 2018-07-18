@@ -1,0 +1,56 @@
+- name: (install-and-configure-supervisor.yml) Install supervisor service via apt
+  apt:
+    name: supervisor
+  become: true
+
+
+- name: (install-and-configure-supervisor.yml) Copy supervisor config file from $playbook_dir/conf-files directory for MySQL server
+  copy:
+    src: "{{ playbook_dir }}/conf-files/superv-mysql.conf"
+    dest: /etc/supervisor/conf.d/
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Copy supervisor config file from $playbook_dir/conf-files directory for Redis server
+  copy:
+    src: "{{ playbook_dir }}/conf-files/superv-redis.conf"
+    dest: /etc/supervisor/conf.d/
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Copy supervisor config file from $playbook_dir/conf-files directory for the project
+  copy:
+    src: "{{ playbook_dir}}/conf-files/superv-webapp.conf"
+    dest: /etc/supervisor/conf.d/
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Copy supervisor config from $playbook_dir/conf-files directory for Nginx server
+  copy:
+    src: "{{ playbook_dir}}/conf-files/superv-nginx.conf"
+    dest: /etc/supervisor/conf.d/
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Copy nginx config file from $playbook_dir/conf-files directory for Nginx server
+  copy:
+    src: /opt/py-app/nginx-default.conf
+    dest: /etc/nginx/sites-enabled/default
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Turn off "daemonize" option for the redis server in the config file
+  shell: sed -i 's/daemonize yes/daemonize no/' /etc/redis/redis.conf
+  args:
+    warn: false
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Start supervisor service (+mysql+redis+nginx+gunicorn)
+  service:
+    name: supervisor
+    state: started
+  become: true
+
+- name: (install-and-configure-supervisor.yml) Check if supervisor service already enabled in rc.local file
+  shell: grep "/etc/init.d/supervisor start" /etc/rc.local;echo $?
+  register: supervisor_check
+
+- name: (install-and-configure-supervisor.yml) Enable supervisor service via rc.local
+  shell: echo '/etc/init.d/supervisor start' >> /etc/rc.local
+  become: yes
+  when: supervisor_check.stdout == "1"

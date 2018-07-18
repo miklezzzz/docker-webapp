@@ -1,0 +1,8 @@
+- name: (create-mysqldb-and-user.yml) Create MySQL database stack_exchange and user for webapp, assign permissions
+  shell: mysql -u root -e "create database stack_exchange"; mysql -u root -e "GRANT ALL PRIVILEGES on stack_exchange.* to 'webapp'@'localhost' IDENTIFIED BY 'M3gaPassw0rd'";mysql -u root -e "FLUSH PRIVILEGES"
+  become: yes
+  ignore_errors: yes
+
+- name: (create-mysqldb-and-user.yml) Create MySQL tables via stackoversearch/tables.sql script
+  shell: mysql -u webapp -pM3gaPassw0rd -D stack_exchange < /opt/stackoversearch/tables.sql
+  ignore_errors: yes

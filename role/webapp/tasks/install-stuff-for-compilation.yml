@@ -1,0 +1,11 @@
+- name: (task name:install-stuff-for-compilation.yml) Install Make, GCC and other dependencies for Python compilation
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - make
+    - gcc
+    - libssl-dev
+    - zlib1g-dev
+    - python3-pip
+  become: true

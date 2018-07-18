@@ -1,0 +1,8 @@
+HOW TO USE
+
+- Clone the project to local directory (/opt/blabla/ for example)
+- Put ./role/webapp directory into your ansible inventory (/etc/ansible/role by default)
+- Change $USERNAME variable in the Dockerfile to your ansible username
+- Insert the ssh public key of your ansible user instead of $SSHPUBKEY variable in the Dockerfile
+- Run docker-exec with appropriate options,( do not hesitate to use --help ), for example: ./docker-exec --init --run --name=MyUbuntu/ssh:dev --Dockerfile=./ --ssh=3022 
+- Run webapp-playbook.yml playbook with extra vars, for example: ansible-playbook ./webapp-playbook.yml -e "cont_name=webapp_cont ssh_port=3022" where "cont_name" defines your docker host in the inventory

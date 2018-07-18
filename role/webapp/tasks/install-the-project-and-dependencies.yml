@@ -1,0 +1,41 @@
+- name: (install-the-project-and-dependencies.yml) Install virtualenv package via pip3
+  shell: pip3 install virtualenv
+  become: true
+
+- name: (install-the-project-and-dependencies.yml) Remove virtual env direcoty if exists (FOR IDEMPOTENCE!)
+  file:
+    path: /opt/stackoversearch/webapp
+    state: absent
+  become: true
+
+- name: (install-the-project-and-dependencies.yml) Make virtual env directory for the project
+  command: virtualenv -p /usr/bin/python3.5 webapp
+  args:
+    chdir: /opt/stackoversearch
+
+- name: (install-the-project-and-dependencies.yml) Install gunicorn package into virtual env
+  shell: /opt/stackoversearch/webapp/bin/pip3 install gunicorn
+
+- name: (install-the-project-and-dependencies.yml) Install dependencies into virtual env via pip3 
+  shell: cd /opt/stackoversearch;/opt/stackoversearch/webapp/bin/pip3 install -e ./
+
+- name: (install-the-project-and-dependencies.yml) Install the project into virtual env
+  shell: cd /opt/stackoversearch;/opt/stackoversearch/webapp/bin/python3.5 setup.py install
+  become: true
+
+#- name: Grant permissions on /opt/stackoversearch to webapp user
+#  file:
+#    path: /opt/stackoversearch
+#    owner: webapp
+#    recurse: yes
+#    state: directory
+#  become: true
+
+#- name: Grant permissions on /etc/stackoversearch to webapp user
+#  file:
+#    path: /etc/stackoversearch
+#    owner: webapp
+#    recurse: yes
+#    state: directory
+#  become: true
+

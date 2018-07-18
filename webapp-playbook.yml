@@ -1,0 +1,4 @@
+---
+- hosts: "{{ cont_name }}"
+  roles:
+     - webapp

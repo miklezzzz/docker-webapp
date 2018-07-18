@@ -1,0 +1,61 @@
+- name: (install-mysql-redis-nginx.yml) Install Redis/MySQL/nginx servers via apt
+  apt:
+    name: "{{packages}}"
+  vars:
+    packages:
+    - redis-server
+    - mysql-server
+    - nginx
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Make /mysql directory in /var/run directory
+  file:
+    path: /var/run/mysqld
+    state: directory
+    mode: 0755
+    owner: mysql
+    group: mysql
+  become: true
+
+
+- name: (install-mysql-redis-nginx.yml) Make /var/log/webapp directory for apps logs
+  file:
+    path: /var/log/webapp
+    state: directory
+    mode: 0775
+    owner: webapp
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Make nginx log directory in /var/log/webapp directory
+  file:
+    path: /var/log/webapp/nginx
+    state: directory
+    mode: 0775
+    owner: www-data
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Make gunicorn log directory in /var/log/webapp directory
+  file:
+    path: /var/log/webapp/gunicorn
+    state: directory
+    mode: 0775
+    owner: webapp
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Change log directory for webapp in /etc/stackoversearch/stack_settings.ini
+  shell: sed -i 's/path = \/etc\/stackoversearch\/logs/path = \/var\/log\/webapp/' /etc/stackoversearch/stack_settings.ini
+  args:
+    warn: false
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Change mysql user for webapp in /etc/stackoversearch/stack_settings.ini
+  shell: sed -i 's/user = root/user = webapp/' /etc/stackoversearch/stack_settings.ini
+  args:
+    warn: false
+  become: true
+
+- name: (install-mysql-redis-nginx.yml) Change mysql password for webapp in /etc/stackoversearch/stack_settings.ini
+  shell: sed -i 's/password = BlackCat00/password = M3gaPassw0rd/' /etc/stackoversearch/stack_settings.ini
+  args:
+    warn: false
+  become: true

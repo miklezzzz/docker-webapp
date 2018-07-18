@@ -1,0 +1,26 @@
+- name: (task name install-git-and-get-the-project.yml) Install git package
+  apt:
+    name: git
+  become: true
+
+- name: (task name install-git-and-get-the-project.yml) Add unprivileged user for the project
+  user:
+    name: webapp
+    comment: User for Web application
+    shell: /usr/sbin/nologin
+    state: present
+  become: true
+
+- name: (task name install-git-and-get-the-project.yml) Make /stackoversearch directory in /opt for the project
+  file:
+    path: /opt/stackoversearch
+    state: directory
+    mode: 0775
+    owner: webapp
+    group: remote_ansible
+  become: true
+
+- name: (task name install-git-and-get-the-project.yml) Clone git project https://github.com/nabokihms/stack_over_search into /opt/stackoversearch
+  git:
+    repo: https://github.com/nabokihms/stack_over_search
+    dest: /opt/stackoversearch

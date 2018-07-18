@@ -1,0 +1,10 @@
+- name: Initial task (do nothing!)
+  debug:
+    msg: "You wanna play? Let's play!©"
+- import_tasks: install-stuff-for-compilation.yml
+- import_tasks: install-Python-from-sources.yml
+- import_tasks: install-git-and-get-the-project.yml
+- import_tasks: install-the-project-and-dependencies.yml
+- import_tasks: install-mysql-redis-nginx.yml
+- import_tasks: install-and-configure-supervisor.yml
+- import_tasks: create-mysqldb-and-user.yml
