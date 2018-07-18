@@ -22,20 +22,3 @@
 - name: (install-the-project-and-dependencies.yml) Install the project into virtual env
   shell: cd /opt/stackoversearch;/opt/stackoversearch/webapp/bin/python3.5 setup.py install
   become: true
-
-#- name: Grant permissions on /opt/stackoversearch to webapp user
-#  file:
-#    path: /opt/stackoversearch
-#    owner: webapp
-#    recurse: yes
-#    state: directory
-#  become: true
-
-#- name: Grant permissions on /etc/stackoversearch to webapp user
-#  file:
-#    path: /etc/stackoversearch
-#    owner: webapp
-#    recurse: yes
-#    state: directory
-#  become: true
-
