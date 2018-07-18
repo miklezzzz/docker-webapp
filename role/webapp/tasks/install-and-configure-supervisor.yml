@@ -30,7 +30,7 @@
 
 - name: (install-and-configure-supervisor.yml) Copy nginx config file from $playbook_dir/conf-files directory for Nginx server
   copy:
-    src: /opt/py-app/nginx-default.conf
+    src: "{{ playbook_dir}}/conf-files/nginx-default.conf"
     dest: /etc/nginx/sites-enabled/default
   become: true
 
